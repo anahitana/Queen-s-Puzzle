@@ -1,0 +1,206 @@
+import java.lang.Math;
+import java.util.*;
+import java.util.Random;
+
+public class Queens2 {
+    private static int boardSize = 10;
+
+    // inverts the order of a series of genes in the genotype
+    public static Integer[] inversionMutate(Integer[] genotype, double p) {
+        // YOUR CODE GOES HERE
+        Random randomGenerator = new Random();
+        List<Integer> myList = new ArrayList<>();
+        int temp;
+
+        double prob = Math.random();
+
+        if (prob < p) {
+            for (int i = 0; i < 2; i++) {
+                int random = randomGenerator.nextInt(10);
+                if (!myList.contains(random)) {
+                    myList.add(random);
+                } else {
+                    i--; // to repeat the loop
+                }
+            }
+
+            int rand1 = myList.get(0);
+            int rand2 = myList.get(1);
+            if (rand1 > rand2) {
+                rand1 = rand2;
+                rand2 = myList.get(0);
+            }
+
+            int len = rand2 - rand1;
+            if (len % 2 == 0) {
+                for (int k = 0; k < len / 2; k++) {
+                    int firstswap = genotype[rand1];
+                    int secondswap = genotype[rand2];
+                    temp = firstswap;
+                    firstswap = secondswap;
+                    secondswap = temp;
+                    genotype[rand1] = firstswap;
+                    genotype[rand2] = secondswap;
+                    rand1++;
+                    rand2--;
+                }
+            } else {
+                for (int k = 0; k < (len + 1) / 2; k++) {
+                    int firstswap = genotype[rand1];
+                    int secondswap = genotype[rand2];
+                    temp = firstswap;
+                    firstswap = secondswap;
+                    secondswap = temp;
+                    genotype[rand1] = firstswap;
+                    genotype[rand2] = secondswap;
+                    rand1++;
+                    rand2--;
+                }
+            }
+        }
+
+        // DUMMY CODE TO REMOVE: (pretends to invert first test genotype)
+        // genotype = new Integer[]{ 1, 2, 3, 8, 7, 6, 5, 4, 9, 10 };
+        // END OF YOUR CODE
+
+        return genotype;
+    }
+
+    /*
+     * performs fitness-proportional parent selection
+     * also known as 'roulette wheel' selection
+     * selects two parents that are different to each other
+     */
+    public static Integer[][] rouletteSelect(Integer[][] population) {
+        Integer[][] parents = new Integer[2][boardSize];
+
+        // YOUR CODE GOES HERE
+
+        int lambda = 2; // number of parents to select
+        int current_member = 0; // current member of the mating pool
+        double[] cumulativeFitness = new double[population.length]; // cumulative fitness array
+        double totalFitness = 0; // total fitness of the population
+
+        // calculate the total fitness of the population
+        for (int i = 0; i < population.length; i++) {
+            totalFitness += Queens.measureFitness(population[i]);
+        }
+
+        // calculate the cumulative fitness array
+        for (int i = 0; i < population.length; i++) {
+            cumulativeFitness[i] = i == 0 ? Queens.measureFitness(population[0]) / totalFitness
+                    : cumulativeFitness[i - 1] + Queens.measureFitness(population[i]) / totalFitness;
+        }
+
+        while (current_member < lambda) {
+            // pick a random value r uniformly from [0, 1]
+            double r = Math.random();
+
+            int i = 0;
+            while (cumulativeFitness[i] < r) {
+                i++;
+            }
+
+            // add the selected parent to the mating pool
+            parents[current_member] = population[i];
+            current_member++;
+        }
+
+        return parents;
+
+        // DUMMY CODE TO REMOVE:
+        // parents[0] = new Integer[] { 10, 6, 4, 2, 8, 5, 9, 1, 3, 7 };
+        // parents[1] = new Integer[] { 9, 4, 3, 1, 2, 5, 10, 7, 8, 6 };
+        // END OF YOUR CODE
+
+    }
+
+    /*
+     * creates a new population through λ + μ survivor selection
+     * given a population of size n, and a set of children of size m
+     * this method will measure the fitness of all individual in the
+     * combined population, and return the n fittest individuals
+     * as the new population
+     */
+    public static Integer[][] survivorSelection(Integer[][] population, Integer[][] children) {
+        Integer[][] newPop = new Integer[10][10];
+
+        // YOUR CODE GOES HERE
+
+        int n = population.length;
+        int m = children.length;
+        int lambda = n;
+        int mu = m;
+        int combinedSize = lambda + mu;
+        Integer[][] combinedPopulation = new Integer[combinedSize][10];
+
+        // Combine the existing population with the newly created children population
+        for (int i = 0; i < n; i++) {
+            combinedPopulation[i] = population[i];
+        }
+        for (int i = 0; i < m; i++) {
+            combinedPopulation[n + i] = children[i];
+        }
+
+        // Measure the fitness of all individuals in the combined population
+        double[] fitnesses = new double[combinedSize];
+        for (int i = 0; i < combinedSize; i++) {
+            fitnesses[i] = Queens.measureFitness(combinedPopulation[i]);
+        }
+
+        // Sort the population based on fitness
+        Integer[][] sortedPopulation = new Integer[combinedSize][10];
+        for (int i = 0; i < combinedSize; i++) {
+            sortedPopulation[i] = combinedPopulation[i];
+        }
+        for (int i = 0; i < combinedSize; i++) {
+            for (int j = i + 1; j < combinedSize; j++) {
+                if (fitnesses[j] > fitnesses[i]) {
+                    double tempFitness = fitnesses[i];
+                    fitnesses[i] = fitnesses[j];
+                    fitnesses[j] = tempFitness;
+                    Integer[] tempGenotype = sortedPopulation[i];
+                    sortedPopulation[i] = sortedPopulation[j];
+                    sortedPopulation[j] = tempGenotype;
+                }
+            }
+        }
+
+        // Select the n fittest individuals to form the new population
+        for (int i = 0; i < n; i++) {
+            newPop[i] = sortedPopulation[i];
+        }
+
+        // END OF YOUR CODE
+
+        return newPop;
+    }
+
+    // counts the number of unique genotypes in the population
+    public static int genoDiversity(Integer[][] population) {
+        int uniqueTypes = 0;
+
+        // YOUR CODE GOES HERE
+        List<Integer[]> uniqueList = new ArrayList<>();
+        for (Integer[] element : population) {
+            boolean isDuplicate = false;
+
+            for (Integer[] uniqueElement : uniqueList) {
+                if (Arrays.equals(element, uniqueElement)) {
+                    isDuplicate = true;
+                    break;
+                }
+            }
+            if (!isDuplicate) {
+                uniqueList.add(element);
+            }
+        }
+
+        uniqueTypes = uniqueList.size();
+        // DUMMY CODE TO REMOVE:
+        // uniqueTypes = 6;
+        // END OF YOUR CODE
+
+        return uniqueTypes;
+    }
+}
