@@ -2,18 +2,6 @@ import java.lang.Math;
 import java.util.*;
 import java.util.Random;
 
-/* YOU NEED TO ADD YOUR CODE TO THIS CLASS, REMOVING ALL DUMMY CODE
- *
- * DO NOT CHANGE THE NAME OR SIGNATURE OF ANY OF THE EXISTING METHODS
- * (Signature includes parameter types, return types and being static)
- *
- * You can add private methods to this class if it makes your code cleaner,
- * but this class MUST work with the UNMODIFIED Tester.java class.
- *
- * This is the ONLY class that you can submit for your assignment.
- *
- * MH 2021
- */
 public class Queens {
     private static int boardSize = 10;
 
