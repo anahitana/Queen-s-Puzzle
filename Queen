@@ -1,0 +1,211 @@
+import java.lang.Math;
+import java.util.*;
+import java.util.Random;
+
+/* YOU NEED TO ADD YOUR CODE TO THIS CLASS, REMOVING ALL DUMMY CODE
+ *
+ * DO NOT CHANGE THE NAME OR SIGNATURE OF ANY OF THE EXISTING METHODS
+ * (Signature includes parameter types, return types and being static)
+ *
+ * You can add private methods to this class if it makes your code cleaner,
+ * but this class MUST work with the UNMODIFIED Tester.java class.
+ *
+ * This is the ONLY class that you can submit for your assignment.
+ *
+ * MH 2021
+ */
+public class Queens {
+    private static int boardSize = 10;
+
+    // creates a valid genotype with random values
+    public static Integer[] randomGenotype() {
+
+        Integer[] genotype = new Integer[boardSize];
+
+        // YOUR CODE GOES HERE
+        Random randomGenerator = new Random();
+        ArrayList<Integer> list = new ArrayList<Integer>();
+
+        for (int i = 0; i < 10; i++) {
+            // int random = randomGenerator.nextInt(10)+1; because range is from 1 to 10
+            int random = randomGenerator.nextInt(10) + 1;
+            if (!list.contains(random)) {
+                list.add(random);
+            } else {
+                i--; // to repeat the loop
+            }
+        }
+
+        genotype = list.toArray(genotype);
+
+        // DUMMY CODE TO REMOVE:
+        // genotype = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+        // END OF YOUR CODE
+
+        return genotype;
+    }
+
+    // swaps 2 genes in the genotype
+    // the swap happens with probability p, so if p = 0.8
+    // then 8 out of 10 times this method is called, a swap happens
+    public static Integer[] swapMutate(Integer[] genotype, double p) {
+        // YOUR CODE GOES HERE
+        Random randomGenerator = new Random();
+        List<Integer> myList = new ArrayList<>();
+        int temp;
+        double prob = Math.random();
+        if (prob < p) {
+            for (int i = 0; i < 2; i++) {
+                int random = randomGenerator.nextInt(10);
+                if (!myList.contains(random)) {
+                    myList.add(random);
+                } else {
+                    i--; // to repeat the loop
+                }
+            }
+            int rand1 = myList.get(0);
+            int rand2 = myList.get(1);
+
+            int firstswap = genotype[rand1];
+            int secondswap = genotype[rand2];
+            temp = firstswap;
+            firstswap = secondswap;
+            secondswap = temp;
+            genotype[rand1] = firstswap;
+            genotype[rand2] = secondswap;
+
+            // DUMMY CODE TO REMOVE:
+            // genotype = new Integer[] { 1, 2, 3, 8, 7, 6, 5, 4, 9, 10 };
+            // END OF YOUR CODE
+        }
+        return genotype;
+    }
+
+    // creates 2 child genotypes using the 'cut-and-crossfill' method
+    public static Integer[][] cutAndCrossfill(Integer[] parent0, Integer[] parent1) {
+
+        Integer[][] children = new Integer[2][boardSize];
+
+        // YOUR CODE GOES HERE
+        int mid = boardSize / 2;
+        List<Integer> secpart0 = new ArrayList<>();
+        List<Integer> secpart1 = new ArrayList<>();
+        List<Integer> firstpart0 = new ArrayList<>();
+        List<Integer> firstpart1 = new ArrayList<>();
+        for (int i = 0; i < mid; i++) {
+            children[0][i] = parent0[i];
+            children[1][i] = parent1[i];
+            firstpart0.add(parent0[i]);
+            firstpart1.add(parent1[i]);
+        }
+
+        for (int i = 5; i < 10; i++) {
+            secpart0.add(parent0[i]);
+            secpart1.add(parent1[i]);
+        }
+        int count = 5;
+        int count2 = 5;
+        for (int i = 0; i < 5; i++) {
+            if (!firstpart0.contains(secpart1.get(i))) {
+                children[0][count] = secpart1.get(i);
+                firstpart0.add(secpart1.get(i));
+                count++;
+            }
+            if (!firstpart1.contains(secpart0.get(i))) {
+                children[1][count2] = secpart0.get(i);
+                firstpart1.add(secpart0.get(i));
+                count2++;
+            }
+        }
+        for (int i = 0; i < 5; i++) {
+            if (!firstpart0.contains(firstpart1.get(i))) {
+                children[0][count] = firstpart1.get(i);
+                count++;
+            }
+        }
+
+        for (int i = 0; i < 5; i++) {
+            if (!firstpart1.contains(firstpart0.get(i))) {
+                children[1][count2] = firstpart0.get(i);
+                count2++;
+            }
+        }
+        // DUMMY CODE TO REMOVE:
+        // children[0] = new Integer[] { 5, 4, 2, 6, 8, 1, 10, 9, 7, 3 };
+        // children[1] = new Integer[] { 6, 2, 5, 7, 3, 9, 1, 10, 4, 8 };
+        // END OF YOUR CODE
+
+        return children;
+    }
+
+    // calculates the fitness of an individual
+    public static int measureFitness(Integer[] genotype) {
+        /*
+         * The initial fitness is the maximum pairs of queens
+         * that can be in check (all possible pairs in check).
+         * So we are using it as the maximum fitness value.
+         * We deduct 1 from this value for every pair of queens
+         * found to be in check.
+         * So, the lower the score, the lower the fitness.
+         * For a 10x10 board the maximum fitness is 45 (no checks),
+         * and the minimum fitness is 0 (all queens in a line).
+         */
+        int fitness = (int) (0.5 * boardSize * (boardSize - 1));
+
+        // YOUR CODE GOES HERE
+        // YOUR CODE GOES HERE
+        int penalty = 0;
+        for (int i = 0; i < 10; i++) {
+            int column = i + 1;
+            int theRow = genotype[i];
+            // moving top left
+            int col = column;
+            int row = theRow;
+            while (col - 1 > 0 && row - 1 > 0) {
+                // bruh
+                if (genotype[col - 1 - 1] == row - 1) {
+                    penalty++;
+                }
+                col--;
+                row--;
+            }
+            // moving top right
+            col = column;
+            row = theRow;
+            while (col + 1 < 11 && row - 1 > 0) {
+                // bruh
+                if (genotype[col + 1 - 1] == row - 1) {
+                    penalty++;
+                }
+                col++;
+                row--;
+            }
+            // moving bottom left
+            col = column;
+            row = theRow;
+            while (col - 1 > 0 && row + 1 < 11) {
+                // bruh
+                if (genotype[col - 1 - 1] == row + 1) {
+                    penalty++;
+                }
+                col--;
+                row++;
+            }
+            // moving bottom right
+            col = column;
+            row = theRow;
+            while (col + 1 < 11 && row + 1 < 11) {
+                // bruh
+                if (genotype[col + 1 - 1] == row + 1) {
+                    penalty++;
+                }
+                col++;
+                row++;
+            }
+
+        }
+
+        fitness = fitness - (penalty / 2);
+        return fitness;
+    }
+}
