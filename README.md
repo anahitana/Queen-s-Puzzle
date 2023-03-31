@@ -16,3 +16,7 @@ Survivor Selection
 Measuring Population Diversity (often useful for termination criteria and analysing a GA's performance)
 
 to get better results for my puzzle.
+
+
+https://user-images.githubusercontent.com/100180792/229189062-00b3dacf-67ff-4ac6-9553-9c1bc0f69dcc.mp4
+
