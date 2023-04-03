@@ -15,5 +15,5 @@ Parent Selection
 Survivor Selection
 Measuring Population Diversity (often useful for termination criteria and analysing a GA's performance)
 
-to get better results for my puzzle.
+to get better results for the puzzle.
 
