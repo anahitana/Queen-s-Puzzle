@@ -1,5 +1,5 @@
 #  An evolutionary algorithm to solve the 10 Queens Puzzle
-it has f main components:
+it has 4 main components:
 Initialisation
 Mutation
 Crossover
